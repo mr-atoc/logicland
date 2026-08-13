@@ -694,6 +694,69 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
   100% { opacity: 1; transform: translate(var(--dx, 0), 105vh) rotate(680deg); }
 }
 
+/* ---------- Логические таблицы ---------- */
+.matrix-round { max-width: 480px; margin: 0 auto; }
+
+.matrix-question {
+  text-align: center;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin: 0 0 14px;
+}
+
+.matrix-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: min(88vw, 360px);
+  margin: 0 auto 20px;
+}
+
+.matrix-cell {
+  aspect-ratio: 1;
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  color: var(--ink);
+}
+
+.matrix-cell.matrix-target {
+  background: var(--bg-accent);
+  outline: 2px dashed var(--primary);
+  outline-offset: -4px;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.matrix-svg { width: 100%; height: 100%; }
+
+.matrix-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.matrix-option-btn {
+  padding: 10px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+}
+
+.matrix-option-btn .matrix-svg { width: 90%; height: 90%; }
+
+.matrix-options.wide { grid-template-columns: repeat(2, 1fr); }
+.matrix-options.wide .matrix-option-btn { aspect-ratio: 2 / 1; }
+
+@media (max-width: 480px) {
+  .matrix-options { grid-template-columns: repeat(2, 1fr); }
+}
+
 /* ---------- Адаптивность и доступность ---------- */
 @media (max-width: 480px) {
   .question { font-size: 1.8rem; padding: 24px 14px; }

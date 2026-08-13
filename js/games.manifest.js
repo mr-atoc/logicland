@@ -34,6 +34,14 @@ export const games = [
     tags: ['слова'],
     module: () => import('./games/word-search/game.js'),
   },
+  {
+    id: 'shape-matrix',
+    title: 'Логические таблицы',
+    description: 'В таблице спряталось правило — разгадай его и выбери, что должно быть в пустой клетке.',
+    icon: '🗂️',
+    tags: ['логика'],
+    module: () => import('./games/shape-matrix/game.js'),
+  },
 ];
 
 export function getGame(id) {
