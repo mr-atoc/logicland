@@ -37,6 +37,74 @@ export function genMaze(n) {
   return cells;
 }
 
+// Круговой (полярный) лабиринт: rings колец по sectors секторов.
+// inner[r][s] — стена между клеткой (r,s) и (r-1,s); при r=0 это стена к центру (всегда есть).
+// cw[r][s]   — стена между (r,s) и соседом по кольцу (r,(s+1)%sectors).
+export function genPolarMaze(rings, sectors) {
+  const inner = Array.from({ length: rings }, () => Array(sectors).fill(1));
+  const cw = Array.from({ length: rings }, () => Array(sectors).fill(1));
+  const visited = Array.from({ length: rings }, () => Array(sectors).fill(false));
+  const stack = [[0, 0]];
+  visited[0][0] = true;
+  while (stack.length) {
+    const [r, s] = stack[stack.length - 1];
+    const neighbors = shuffle([
+      [r, (s + 1) % sectors, () => { cw[r][s] = 0; }],
+      [r, (s - 1 + sectors) % sectors, () => { cw[r][(s - 1 + sectors) % sectors] = 0; }],
+      [r + 1, s, () => { inner[r + 1][s] = 0; }],
+      [r - 1, s, () => { inner[r][s] = 0; }],
+    ]).filter(([nr, ns]) => nr >= 0 && nr < rings && !visited[nr][ns]);
+    if (!neighbors.length) {
+      stack.pop();
+      continue;
+    }
+    const [nr, ns, knock] = neighbors[0];
+    knock();
+    visited[nr][ns] = true;
+    stack.push([nr, ns]);
+  }
+  return { rings, sectors, inner, cw };
+}
+
+// Можно ли пройти между соседними клетками полярного лабиринта.
+export function polarPassable(maze, a, b) {
+  const S = maze.sectors;
+  if (a.r === b.r) {
+    if ((a.s + 1) % S === b.s) return maze.cw[a.r][a.s] === 0;
+    if ((b.s + 1) % S === a.s) return maze.cw[b.r][b.s] === 0;
+    return false;
+  }
+  if (a.s !== b.s) return false;
+  if (b.r === a.r + 1) return maze.inner[b.r][b.s] === 0;
+  if (a.r === b.r + 1) return maze.inner[a.r][a.s] === 0;
+  return false;
+}
+
+// Кратчайший путь от центра (0,0) до клетки exit — для тестов.
+export function polarShortestPath(maze, exit) {
+  const { rings, sectors } = maze;
+  const dist = Array.from({ length: rings }, () => Array(sectors).fill(-1));
+  dist[0][0] = 0;
+  const queue = [[0, 0]];
+  while (queue.length) {
+    const [r, s] = queue.shift();
+    const candidates = [
+      { r, s: (s + 1) % sectors },
+      { r, s: (s - 1 + sectors) % sectors },
+      { r: r + 1, s },
+      { r: r - 1, s },
+    ];
+    for (const nb of candidates) {
+      if (nb.r < 0 || nb.r >= rings) continue;
+      if (dist[nb.r][nb.s] !== -1) continue;
+      if (!polarPassable(maze, { r, s }, nb)) continue;
+      dist[nb.r][nb.s] = dist[r][s] + 1;
+      queue.push([nb.r, nb.s]);
+    }
+  }
+  return dist[exit.r][exit.s];
+}
+
 // Длина кратчайшего пути (BFS) — для тестов и подсчёта оптимума.
 export function shortestPath(cells) {
   const n = cells.length;

@@ -840,18 +840,62 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
 .maze-grid {
   display: grid;
   width: min(92vw, 520px);
-  margin: 12px auto 16px;
+  width: min(92vw, 520px, calc(100dvh - 210px)); /* квадрат должен влезать по высоте */
+  margin: 8px auto 12px;
   background: var(--card);
   border-radius: 8px;
   box-shadow: var(--shadow);
   padding: 4px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.maze-cell.path { background: var(--bg-accent); }
+
+.maze-svg {
+  display: block;
+  width: min(92vw, 520px);
+  width: min(92vw, 520px, calc(100dvh - 190px));
+  margin: 8px auto 8px;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.maze-walls {
+  stroke: var(--ink);
+  stroke-width: 4;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.maze-trail {
+  stroke: var(--primary);
+  stroke-width: 8;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.75;
+}
+
+.maze-emoji {
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
 }
 
 .maze-cell {
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  font-size: clamp(0.55rem, 3.4vw, 1.3rem);
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  line-height: 1;
   border: 0 solid var(--line);
 }
 
@@ -860,18 +904,24 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
 .maze-cell.wb { border-bottom-width: 2px; }
 .maze-cell.wl { border-left-width: 2px; }
 
-/* Кнопки разнесены по краям — удобно держать планшет двумя руками */
+/* Кнопки закреплены в нижних углах экрана — под большие пальцы на планшете */
 .maze-controls {
+  position: fixed;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  max-width: 520px;
-  margin: 0 auto;
-  padding: 0 6px;
+  align-items: flex-end;
+  pointer-events: none; /* пространство между кластерами не перехватывает нажатия */
+  z-index: 30;
 }
 
-.maze-cluster { display: flex; gap: 12px; }
+.maze-cluster { display: flex; gap: 12px; pointer-events: auto; }
 .maze-cluster-v { flex-direction: column; }
+
+/* чтобы кнопка «К лабиринтам» не пряталась под закреплёнными стрелками */
+.maze-wrap.with-pad { padding-bottom: 150px; }
 
 .maze-pad-btn {
   width: 66px;
