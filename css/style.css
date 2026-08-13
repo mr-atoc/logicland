@@ -757,6 +757,159 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
   .matrix-options { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* ---------- Задачи-смекалки ---------- */
+.teaser-question { font-size: 1.25rem; line-height: 1.5; text-align: left; }
+
+.teaser-answer-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.teaser-input {
+  width: 140px;
+  padding: 12px 14px;
+  border: 2px solid var(--bg-accent);
+  border-radius: 12px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  font-family: inherit;
+  text-align: center;
+  background: var(--card);
+  color: var(--ink);
+}
+
+.teaser-input:focus { outline: none; border-color: var(--primary); }
+
+.weekday-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.weekday-btn { padding: 12px 8px; }
+
+.teaser-feedback {
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  min-height: 1.4em;
+  margin: 14px 0 0;
+}
+
+.teaser-feedback.ok { color: var(--right); }
+.teaser-feedback.bad { color: var(--wrong); }
+
+/* ---------- Расставь знаки ---------- */
+.signs-expr {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 26px 16px;
+  margin-bottom: 8px;
+}
+
+.signs-num { font-size: 2rem; font-weight: 800; }
+
+.signs-slot {
+  width: 52px;
+  height: 52px;
+  border: 2px dashed var(--primary);
+  border-radius: 12px;
+  background: var(--bg-accent);
+  color: var(--primary);
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.signs-slot:hover:not(:disabled) { transform: scale(1.1); }
+.signs-slot.picked { border-style: solid; background: var(--card); color: var(--ink); }
+
+/* ---------- Лабиринт ---------- */
+.maze-wrap { max-width: 560px; margin: 0 auto; animation: fade-up 0.3s ease both; }
+
+.maze-grid {
+  display: grid;
+  width: min(92vw, 520px);
+  margin: 12px auto 16px;
+  background: var(--card);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 4px;
+}
+
+.maze-cell {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  font-size: clamp(0.7rem, 3.4vw, 1.3rem);
+  border: 0 solid var(--line);
+}
+
+.maze-cell.wt { border-top-width: 2px; }
+.maze-cell.wr { border-right-width: 2px; }
+.maze-cell.wb { border-bottom-width: 2px; }
+.maze-cell.wl { border-left-width: 2px; }
+
+.maze-dpad { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.maze-dpad-row { display: flex; gap: 6px; }
+.maze-pad-btn { width: 56px; height: 48px; font-size: 1.3rem; }
+
+/* ---------- Пирамиды и весы ---------- */
+.pyramid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px 12px;
+  margin-bottom: 14px;
+}
+
+.pyramid-row { display: flex; gap: 6px; }
+
+.pyramid-cell {
+  width: clamp(54px, 14vw, 68px);
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-family: inherit;
+  color: var(--ink);
+  padding: 0;
+}
+
+.pyramid-cell.hidden-cell {
+  background: var(--bg-accent);
+  border: 2px dashed var(--primary);
+  cursor: pointer;
+}
+
+.pyramid-cell.sel { outline: 3px solid var(--primary); }
+.pyramid-cell.solved { background: var(--right); border-color: var(--right); color: #fff; animation: pop 0.4s ease; }
+.pyramid-cell.shake { animation: shake 0.4s ease; }
+
+.pyramid-choices .answer-btn { font-size: 1.3rem; padding: 14px; }
+
+.scales-facts { font-size: 1.4rem; display: grid; gap: 10px; }
+.scales-fact { font-weight: 700; }
+.scales-question { font-weight: 800; color: var(--primary); margin-top: 6px; }
+
 /* ---------- Адаптивность и доступность ---------- */
 @media (max-width: 480px) {
   .question { font-size: 1.8rem; padding: 24px 14px; }

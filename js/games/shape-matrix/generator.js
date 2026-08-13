@@ -99,6 +99,28 @@ export function genSizeGrid() {
   return { type: 'size', grid, target, answer, options: pickOptions(allCombos, answer) };
 }
 
+// Уровень «Повороты»: фигура постоянна по строке, поворот растёт по столбцу.
+const ROT_SHAPES = ['arrow', 'flag', 'ell', 'dotSquare'];
+const ANGLES = [0, 90, 180];
+
+export function genRotateGrid() {
+  const n = 3;
+  const rowShapes = shuffle(ROT_SHAPES).slice(0, n);
+  const grid = [];
+  for (let r = 0; r < n; r++) {
+    const row = [];
+    for (let c = 0; c < n; c++) {
+      row.push({ type: 'rotate', shape: rowShapes[r], angle: ANGLES[c], key: `${rowShapes[r]}@${ANGLES[c]}` });
+    }
+    grid.push(row);
+  }
+  const target = { r: randInt(0, n - 1), c: randInt(0, n - 1) };
+  const answer = grid[target.r][target.c];
+  const allCombos = rowShapes.flatMap((shape) =>
+    ANGLES.map((angle) => ({ type: 'rotate', shape, angle, key: `${shape}@${angle}` })));
+  return { type: 'rotate', grid, target, answer, options: pickOptions(allCombos, answer) };
+}
+
 // Уровень 4: три независимых признака сразу — форма, размер и стиль обводки.
 export function genTripleGrid() {
   const n = 3;

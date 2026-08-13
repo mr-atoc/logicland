@@ -1,24 +1,22 @@
 import { el } from '../../core/dom.js';
 import { sound } from '../../core/sound.js';
 import { confetti, starsEl } from '../../core/fx.js';
-import { renderCell } from './shapes.js';
-import { genPairGrid, genHouseGrid, genSizeGrid, genRotateGrid, genTripleGrid } from './generator.js';
+import { WEEKDAYS, genTask } from './generator.js';
 
 const QUESTIONS_PER_ROUND = 6;
 const GOOD_SCORE = 5;
 
 const LEVELS = [
-  { n: 1, title: 'Пары фигур', hint: 'запомни обе фигуры в клетке', gen: genPairGrid },
-  { n: 2, title: 'Домики', hint: 'крыша и окошко меняются по-своему', gen: genHouseGrid },
-  { n: 3, title: 'Ряд по размеру', hint: 'фигура растёт или уменьшается', gen: genSizeGrid },
-  { n: 4, title: 'Повороты', hint: 'фигура крутится по правилу', gen: genRotateGrid },
-  { n: 5, title: 'Тройная логика', hint: 'три признака сразу', gen: genTripleGrid },
+  { n: 1, title: 'Ноги и головы', hint: 'посчитай обитателей двора' },
+  { n: 2, title: 'Календарь', hint: 'дни недели и даты' },
+  { n: 3, title: 'Этажи и лифты', hint: 'ступеньки и этажи' },
+  { n: 4, title: 'Возрасты', hint: 'кто старше и на сколько' },
 ];
 
 function starsFor(correct) {
-  if (correct >= QUESTIONS_PER_ROUND) return 3;
-  if (correct >= QUESTIONS_PER_ROUND - 1) return 2;
-  if (correct >= QUESTIONS_PER_ROUND - 2) return 1;
+  if (correct >= 6) return 3;
+  if (correct >= 5) return 2;
+  if (correct >= 4) return 1;
   return 0;
 }
 
@@ -39,12 +37,12 @@ export default {
       root.replaceChildren(
         el('div', { class: 'level-select' },
           el('p', { class: 'game-intro' },
-            `${api.profile.emoji} ${api.profile.name}, в таблице спряталось правило — реши, что должно быть в пустой клетке!`),
+            `${api.profile.emoji} ${api.profile.name}, это задачки на смекалку — читай внимательно, тут есть подвохи!`),
           el('div', { class: 'level-grid' },
             ...LEVELS.map((level) => {
               const best = state.best[level.n];
               return el('button', { class: 'level-card', onclick: () => startRound(level) },
-                el('div', { class: 'level-icon' }, '🗂️'),
+                el('div', { class: 'level-icon' }, '🧠'),
                 el('div', { class: 'level-name' }, level.title),
                 el('div', { class: 'level-hint' }, level.hint),
                 el('div', { class: 'level-best' },
@@ -59,60 +57,66 @@ export default {
     function startRound(level) {
       let index = 0;
       let correct = 0;
+      const seen = new Set();
 
       function nextQuestion() {
         if (index >= QUESTIONS_PER_ROUND) {
           showResults(level, correct);
           return;
         }
-        const puzzle = level.gen();
+        let task = genTask(level.n);
+        for (let tries = 0; tries < 10 && seen.has(task.text); tries++) task = genTask(level.n);
+        seen.add(task.text);
         index += 1;
 
-        const boardEl = el('div', { class: 'matrix-board' });
-        for (let r = 0; r < 3; r++) {
-          for (let c = 0; c < 3; c++) {
-            const isTarget = r === puzzle.target.r && c === puzzle.target.c;
-            boardEl.append(
-              isTarget
-                ? el('div', { class: 'matrix-cell matrix-target' }, '?')
-                : el('div', { class: 'matrix-cell' }, renderCell(puzzle.grid[r][c])),
-            );
-          }
-        }
+        const feedbackEl = el('p', { class: 'teaser-feedback' });
+        let answered = false;
 
-        const optionsEl = el('div', { class: `matrix-options${puzzle.type === 'pair' ? ' wide' : ''}` },
-          ...puzzle.options.map((option) =>
-            el('button', {
-              class: 'answer-btn matrix-option-btn',
-              onclick: (event) => onAnswer(event.currentTarget, option),
-            }, renderCell(option))),
-        );
-
-        function onAnswer(button, option) {
-          optionsEl.querySelectorAll('button').forEach((b) => { b.disabled = true; });
-          const isRight = option.key === puzzle.answer.key;
+        function finish(userAnswer) {
+          if (answered) return;
+          answered = true;
+          const isRight = String(userAnswer).trim().toLowerCase() === String(task.answer).toLowerCase();
           if (isRight) correct += 1;
           (isRight ? sound.right : sound.wrong)();
-          button.classList.add(isRight ? 'right' : 'wrong');
-          if (!isRight) {
-            const correctIdx = puzzle.options.findIndex((o) => o.key === puzzle.answer.key);
-            optionsEl.children[correctIdx]?.classList.add('right');
-          }
-          setTimeout(nextQuestion, isRight ? 900 : 1800);
+          feedbackEl.textContent = isRight ? '✅ Верно!' : `❌ Правильный ответ: ${task.answer}`;
+          feedbackEl.className = `teaser-feedback ${isRight ? 'ok' : 'bad'}`;
+          root.querySelectorAll('button, input').forEach((node) => { node.disabled = true; });
+          setTimeout(nextQuestion, isRight ? 1000 : 2200);
+        }
+
+        let answerArea;
+        if (task.kind === 'weekday') {
+          answerArea = el('div', { class: 'weekday-grid' },
+            ...WEEKDAYS.map((day) =>
+              el('button', { class: 'btn weekday-btn', onclick: () => finish(day) }, day)),
+          );
+        } else {
+          const input = el('input', {
+            class: 'teaser-input', type: 'number', inputmode: 'numeric', placeholder: 'Ответ',
+            onkeydown: (e) => { if (e.key === 'Enter' && input.value !== '') finish(input.value); },
+          });
+          answerArea = el('div', { class: 'teaser-answer-row' },
+            input,
+            el('button', {
+              class: 'btn btn-primary',
+              onclick: () => { if (input.value !== '') finish(input.value); },
+            }, 'Ответить'),
+          );
+          setTimeout(() => input.focus(), 50);
         }
 
         root.replaceChildren(
-          el('div', { class: 'round matrix-round' },
+          el('div', { class: 'round' },
             el('div', { class: 'round-top' },
-              el('span', {}, `🗂️ ${level.title}`),
-              el('span', {}, `Вопрос ${index} из ${QUESTIONS_PER_ROUND} · ✅ ${correct}`),
+              el('span', {}, `🧠 ${level.title}`),
+              el('span', {}, `Задача ${index} из ${QUESTIONS_PER_ROUND} · ✅ ${correct}`),
             ),
             el('div', { class: 'progress-track' },
               el('div', { class: 'progress-fill', style: `width:${((index - 1) / QUESTIONS_PER_ROUND) * 100}%` }),
             ),
-            el('p', { class: 'matrix-question' }, 'Отметь картинку, которая должна быть в пустой ячейке.'),
-            boardEl,
-            optionsEl,
+            el('div', { class: 'question teaser-question' }, task.text),
+            answerArea,
+            feedbackEl,
           ),
         );
       }
@@ -135,14 +139,14 @@ export default {
       root.replaceChildren(
         el('div', { class: 'results' },
           starsEl(stars),
-          el('h2', {}, correct >= GOOD_SCORE ? 'Ты разгадал правило!' : 'Хорошая попытка!'),
+          el('h2', {}, correct >= GOOD_SCORE ? 'Вот это смекалка!' : 'Хорошая попытка!'),
           el('p', { class: 'results-score' }, `Правильных ответов: ${correct} из ${QUESTIONS_PER_ROUND}`),
           el('div', { class: 'results-actions' },
             el('button', { class: 'btn btn-primary', onclick: () => startRound(level) }, 'Ещё раз 🔁'),
             nextLevel
               ? el('button', { class: 'btn btn-primary', onclick: () => startRound(nextLevel) }, 'Дальше ▶')
               : '',
-            el('button', { class: 'btn', onclick: showMenu }, 'К уровням 🗂️'),
+            el('button', { class: 'btn', onclick: showMenu }, 'К темам 🧠'),
           ),
         ),
       );

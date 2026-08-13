@@ -2,7 +2,7 @@
 // дальше работает стратегия «кэш сразу, обновление в фоне» (stale-while-revalidate):
 // офлайн всё открывается из кэша, а при наличии сети кэш тихо обновляется.
 // ВАЖНО: при добавлении новой игры добавь её файлы в ASSETS.
-const CACHE = 'logoland-v5';
+const CACHE = 'logoland-v6';
 
 const ASSETS = [
   './',
@@ -32,6 +32,14 @@ const ASSETS = [
   'js/games/shape-matrix/game.js',
   'js/games/shape-matrix/generator.js',
   'js/games/shape-matrix/shapes.js',
+  'js/games/brain-teasers/game.js',
+  'js/games/brain-teasers/generator.js',
+  'js/games/place-signs/game.js',
+  'js/games/place-signs/generator.js',
+  'js/games/maze/game.js',
+  'js/games/maze/generator.js',
+  'js/games/pyramid/game.js',
+  'js/games/pyramid/generator.js',
 ];
 
 self.addEventListener('install', (event) => {

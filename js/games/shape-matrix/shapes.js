@@ -97,12 +97,37 @@ function renderTriple({ shape, scale, style }) {
   return node;
 }
 
+const STROKE = { stroke: 'currentColor', 'stroke-width': 5, fill: 'none' };
+
+function renderRotate({ shape, angle }) {
+  const node = makeSvg('0 0 100 100');
+  const g = svg('g', { transform: `rotate(${angle} 50 50)` });
+  if (shape === 'arrow') {
+    g.append(svg('polygon', { points: '20,42 55,42 55,28 82,50 55,72 55,58 20,58', ...STROKE }));
+  } else if (shape === 'flag') {
+    g.append(
+      svg('line', { x1: 38, y1: 20, x2: 38, y2: 80, ...STROKE }),
+      svg('polygon', { points: '38,24 74,34 38,46', ...STROKE }),
+    );
+  } else if (shape === 'ell') {
+    g.append(svg('path', { d: 'M 36 24 V 72 H 72', ...STROKE, 'stroke-width': 9 }));
+  } else {
+    g.append(
+      svg('rect', { x: 26, y: 26, width: 48, height: 48, ...STROKE }),
+      svg('circle', { cx: 35, cy: 35, r: 5, fill: 'currentColor', stroke: 'none' }),
+    );
+  }
+  node.append(g);
+  return node;
+}
+
 export function renderCell(cellData) {
   switch (cellData.type) {
     case 'pair': return renderPair(cellData);
     case 'house': return renderHouse(cellData);
     case 'size': return renderSize(cellData);
     case 'triple': return renderTriple(cellData);
+    case 'rotate': return renderRotate(cellData);
     default: return makeSvg('0 0 100 100');
   }
 }

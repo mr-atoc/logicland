@@ -42,6 +42,38 @@ export const games = [
     tags: ['логика'],
     module: () => import('./games/shape-matrix/game.js'),
   },
+  {
+    id: 'brain-teasers',
+    title: 'Задачи-смекалки',
+    description: 'Хитрые текстовые задачки: ноги и головы во дворе, дни недели, этажи и возрасты. Читай внимательно!',
+    icon: '🧠',
+    tags: ['смекалка'],
+    module: () => import('./games/brain-teasers/game.js'),
+  },
+  {
+    id: 'place-signs',
+    title: 'Расставь знаки',
+    description: 'Расставь + − × ÷ между числами так, чтобы получился нужный ответ.',
+    icon: '🧮',
+    tags: ['математика'],
+    module: () => import('./games/place-signs/game.js'),
+  },
+  {
+    id: 'maze',
+    title: 'Лабиринт',
+    description: 'Помоги мышонку добраться до сыра! Три лабиринта — от норки до драконьего подземелья.',
+    icon: '🌀',
+    tags: ['логика'],
+    module: () => import('./games/maze/game.js'),
+  },
+  {
+    id: 'pyramid',
+    title: 'Пирамиды и весы',
+    description: 'Заполни числовую пирамиду, где каждое число — сумма двух под ним, и рассуди, что тяжелее на весах.',
+    icon: '🔺',
+    tags: ['математика', 'логика'],
+    module: () => import('./games/pyramid/game.js'),
+  },
 ];
 
 export function getGame(id) {
