@@ -1,0 +1,18 @@
+{
+  "name": "Логоленд — игры на логику",
+  "short_name": "Логоленд",
+  "description": "Детские игры на логику и математику. Работает без интернета.",
+  "lang": "ru",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#eef3fb",
+  "theme_color": "#4f7cff",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

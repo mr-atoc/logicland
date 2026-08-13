@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Логоленд — игры на логику и смекалку</title>
+  <meta name="theme-color" content="#4f7cff">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <script>
+    // Применяем тему до загрузки стилей, чтобы страница не «мигала»
+    try {
+      document.documentElement.dataset.theme =
+        JSON.parse(localStorage.getItem('logoland.theme') || 'null')
+        || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">🧠 Логоленд</a>
+    <div class="header-actions">
+      <button id="themeBtn" class="icon-btn" type="button" title="Тема">🌙</button>
+      <button id="soundBtn" class="icon-btn" type="button" title="Звук">🔊</button>
+      <button id="profileBtn" class="profile-chip" type="button">👤 Игрок</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="page-title">Выбери игру</h1>
+    <div id="gameList" class="game-grid"></div>
+  </main>
+
+  <dialog id="profileDialog" class="profile-dialog">
+    <h2>Кто играет?</h2>
+    <div id="profileList" class="profile-list"></div>
+    <form id="newProfileForm" method="dialog">
+      <p class="form-label">Новый игрок:</p>
+      <input id="profileName" name="name" placeholder="Как тебя зовут?" maxlength="20" autocomplete="off" required>
+      <div id="avatarRow" class="avatar-row"></div>
+      <button type="submit" class="btn btn-primary">Начать! 🚀</button>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/pages/index.js"></script>
+</body>
+</html>

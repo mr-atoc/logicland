@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Логоленд</title>
+  <meta name="theme-color" content="#4f7cff">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <script>
+    // Применяем тему до загрузки стилей, чтобы страница не «мигала»
+    try {
+      document.documentElement.dataset.theme =
+        JSON.parse(localStorage.getItem('logoland.theme') || 'null')
+        || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="back-link" href="index.html">← Все игры</a>
+    <div id="gameTitle" class="game-title"></div>
+    <div class="header-actions">
+      <button id="themeBtn" class="icon-btn" type="button" title="Тема">🌙</button>
+      <button id="soundBtn" class="icon-btn" type="button" title="Звук">🔊</button>
+      <div id="profileChip" class="profile-chip profile-chip-static"></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="gameRoot" class="game-root"></div>
+  </main>
+
+  <script type="module" src="js/pages/game.js"></script>
+</body>
+</html>
