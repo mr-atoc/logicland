@@ -127,6 +127,11 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
 
 .icon-btn:hover { transform: scale(1.08); }
 .icon-btn:active { transform: scale(0.94); }
+.icon-btn.spinning { animation: spin 0.8s linear infinite; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
 .back-link {
   text-decoration: none;
@@ -669,6 +674,26 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
 .ws-cell.hintflash { background: var(--hint-flash); animation: pop 0.4s ease; }
 
 .ws-help { text-align: center; color: var(--ink-soft); font-size: 0.9rem; }
+
+/* ---------- Плашка «вышла новая версия» ---------- */
+.update-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 18px;
+  border-radius: 999px;
+  background: var(--card);
+  box-shadow: var(--shadow-lift);
+  font-weight: 700;
+  animation: fade-up 0.35s ease both;
+}
+
+.update-banner .btn { padding: 8px 16px; }
 
 /* ---------- Конфетти ---------- */
 .confetti {

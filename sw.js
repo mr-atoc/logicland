@@ -2,7 +2,7 @@
 // дальше работает стратегия «кэш сразу, обновление в фоне» (stale-while-revalidate):
 // офлайн всё открывается из кэша, а при наличии сети кэш тихо обновляется.
 // ВАЖНО: при добавлении новой игры добавь её файлы в ASSETS.
-const CACHE = 'logoland-v10';
+const CACHE = 'logoland-v14';
 
 const ASSETS = [
   './',
@@ -44,7 +44,11 @@ const ASSETS = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting()),
+    caches.open(CACHE)
+      // cache: 'reload' — берём файлы строго из сети, минуя браузерный HTTP-кэш.
+      // Без этого хостинг отдаёт свои 10-минутные копии, и в новый кэш попадает старая версия.
+      .then((cache) => cache.addAll(ASSETS.map((url) => new Request(url, { cache: 'reload' }))))
+      .then(() => self.skipWaiting()),
   );
 });
 
@@ -63,7 +67,8 @@ self.addEventListener('fetch', (event) => {
     const cache = await caches.open(CACHE);
     // ignoreSearch: game.html?id=... должен находиться как game.html
     const cached = await cache.match(request, { ignoreSearch: true });
-    const network = fetch(request)
+    // no-cache: фоновое обновление всегда сверяется с сервером, а не с HTTP-кэшем
+    const network = fetch(new Request(request.url, { cache: 'no-cache' }))
       .then((response) => {
         if (response.ok) cache.put(request, response.clone());
         return response;

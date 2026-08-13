@@ -1,10 +1,20 @@
-// Кнопки в шапке: переключение темы и звука (общие для всех страниц).
+// Кнопки в шапке: тема, звук и обновление версии (общие для всех страниц).
 import { sound } from './sound.js';
 import { toggleTheme, effectiveTheme } from './theme.js';
+import { hardRefresh } from './pwa.js';
 
 export function initHeaderControls() {
   const themeBtn = document.getElementById('themeBtn');
   const soundBtn = document.getElementById('soundBtn');
+  const refreshBtn = document.getElementById('refreshBtn');
+
+  refreshBtn?.addEventListener('click', () => {
+    refreshBtn.classList.add('spinning');
+    refreshBtn.disabled = true;
+    sound.tap();
+    hardRefresh();
+  });
+
   if (!themeBtn || !soundBtn) return;
 
   const syncIcons = () => {
