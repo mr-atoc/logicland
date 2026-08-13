@@ -851,7 +851,7 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  font-size: clamp(0.7rem, 3.4vw, 1.3rem);
+  font-size: clamp(0.55rem, 3.4vw, 1.3rem);
   border: 0 solid var(--line);
 }
 

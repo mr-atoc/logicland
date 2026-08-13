@@ -52,8 +52,10 @@ export default {
     function startRound(level) {
       let round = 0;
       let mistakes = 0;
+      let exited = false;
 
       function next() {
+        if (exited) return;
         round += 1;
         if (round > level.rounds) {
           showResults(level, mistakes);
@@ -142,6 +144,9 @@ export default {
             el('p', { class: 'matrix-question' }, 'Нажми на пустую клетку и выбери число.'),
             pyramidEl,
             choicesEl,
+            el('div', { class: 'game-toolbar' },
+              el('button', { class: 'btn', onclick: () => { exited = true; showMenu(); } }, '🚪 К уровням'),
+            ),
           ),
         );
       }
@@ -174,6 +179,9 @@ export default {
                     setTimeout(next, isRight ? 800 : 1600);
                   },
                 }, option)),
+            ),
+            el('div', { class: 'game-toolbar' },
+              el('button', { class: 'btn', onclick: () => { exited = true; showMenu(); } }, '🚪 К уровням'),
             ),
           ),
         );

@@ -59,8 +59,10 @@ export default {
     function startRound(level) {
       let index = 0;
       let correct = 0;
+      let exited = false;
 
       function nextQuestion() {
+        if (exited) return;
         if (index >= QUESTIONS_PER_ROUND) {
           showResults(level, correct);
           return;
@@ -113,6 +115,9 @@ export default {
             el('p', { class: 'matrix-question' }, 'Отметь картинку, которая должна быть в пустой ячейке.'),
             boardEl,
             optionsEl,
+            el('div', { class: 'game-toolbar' },
+              el('button', { class: 'btn', onclick: () => { exited = true; showMenu(); } }, '🚪 К уровням'),
+            ),
           ),
         );
       }

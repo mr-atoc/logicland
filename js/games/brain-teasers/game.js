@@ -57,9 +57,11 @@ export default {
     function startRound(level) {
       let index = 0;
       let correct = 0;
+      let exited = false;
       const seen = new Set();
 
       function nextQuestion() {
+        if (exited) return;
         if (index >= QUESTIONS_PER_ROUND) {
           showResults(level, correct);
           return;
@@ -117,6 +119,9 @@ export default {
             el('div', { class: 'question teaser-question' }, task.text),
             answerArea,
             feedbackEl,
+            el('div', { class: 'game-toolbar' },
+              el('button', { class: 'btn', onclick: () => { exited = true; showMenu(); } }, '🚪 К темам'),
+            ),
           ),
         );
       }

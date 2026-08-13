@@ -257,8 +257,10 @@ export default {
     function startRound(level) {
       let index = 0;
       let correct = 0;
+      let exited = false;
 
       function nextQuestion() {
+        if (exited) return;
         if (index >= QUESTIONS_PER_ROUND) {
           showResults(level, correct);
           return;
@@ -300,6 +302,9 @@ export default {
               el('span', { class: 'seq-chip seq-question', style: `--i:${question.sequence.length}` }, '?'),
             ),
             answers,
+            el('div', { class: 'game-toolbar' },
+              el('button', { class: 'btn', onclick: () => { exited = true; showLevels(); } }, '🚪 К уровням'),
+            ),
           ),
         );
       }

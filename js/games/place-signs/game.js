@@ -57,8 +57,10 @@ export default {
     function startRound(level) {
       let index = 0;
       let correct = 0;
+      let exited = false;
 
       function nextQuestion() {
+        if (exited) return;
         if (index >= QUESTIONS_PER_ROUND) {
           showResults(level, correct);
           return;
@@ -127,7 +129,10 @@ export default {
             ),
             el('p', { class: 'matrix-question' }, 'Нажимай на «?», чтобы выбрать знак.'),
             exprEl,
-            el('div', { class: 'game-toolbar' }, checkBtn),
+            el('div', { class: 'game-toolbar' },
+              checkBtn,
+              el('button', { class: 'btn', onclick: () => { exited = true; showMenu(); } }, '🚪 К уровням'),
+            ),
             feedbackEl,
           ),
         );

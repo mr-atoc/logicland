@@ -163,9 +163,11 @@ export default {
     function startRound(level) {
       let index = 0;
       let correct = 0;
+      let exited = false;
       const seen = new Set(); // без повторов примеров внутри раунда
 
       function nextQuestion() {
+        if (exited) return;
         if (index >= QUESTIONS_PER_ROUND) {
           showResults(level, correct);
           return;
@@ -208,6 +210,9 @@ export default {
             ),
             el('div', { class: 'question' }, question.text),
             answers,
+            el('div', { class: 'game-toolbar' },
+              el('button', { class: 'btn', onclick: () => { exited = true; showLevels(); } }, '🚪 К станциям'),
+            ),
           ),
         );
       }
