@@ -860,9 +860,27 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
 .maze-cell.wb { border-bottom-width: 2px; }
 .maze-cell.wl { border-left-width: 2px; }
 
-.maze-dpad { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.maze-dpad-row { display: flex; gap: 6px; }
-.maze-pad-btn { width: 56px; height: 48px; font-size: 1.3rem; }
+/* Кнопки разнесены по краям — удобно держать планшет двумя руками */
+.maze-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 6px;
+}
+
+.maze-cluster { display: flex; gap: 12px; }
+.maze-cluster-v { flex-direction: column; }
+
+.maze-pad-btn {
+  width: 66px;
+  height: 66px;
+  font-size: 1.6rem;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
 /* ---------- Пирамиды и весы ---------- */
 .pyramid {
