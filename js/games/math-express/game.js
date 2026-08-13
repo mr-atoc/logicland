@@ -127,32 +127,64 @@ const starRow = (stars) => '⭐'.repeat(stars) || '—';
 
 export default {
   mount(root, api) {
-    const state = api.loadState() ?? { best: {} };
+    const state = api.loadState() ?? {};
+    // best — рекорды режима с вариантами, bestInput — режима с вводом ответа
+    state.best ??= {};
+    state.bestInput ??= {};
+    state.mode ??= 'choice';
+
+    const records = () => (state.mode === 'input' ? state.bestInput : state.best);
 
     function save() {
       api.saveState(state);
-      const totalStars = LEVELS.reduce((sum, l) => sum + (state.best[l.n]?.stars ?? 0), 0);
-      const totalScore = LEVELS.reduce((sum, l) => sum + (state.best[l.n]?.correct ?? 0) * 10, 0);
+      // в общий зачёт идёт лучший результат из двух режимов
+      const bestStars = (n) => Math.max(state.best[n]?.stars ?? 0, state.bestInput[n]?.stars ?? 0);
+      const bestCorrect = (n) => Math.max(state.best[n]?.correct ?? 0, state.bestInput[n]?.correct ?? 0);
+      const totalStars = LEVELS.reduce((sum, l) => sum + bestStars(l.n), 0);
+      const totalScore = LEVELS.reduce((sum, l) => sum + bestCorrect(l.n) * 10, 0);
       api.reportResult({
         score: totalScore,
         summary: `⭐ ${totalStars} из ${LEVELS.length * 3}`,
       });
     }
 
+    function modeSwitch() {
+      const option = (mode, label, hint) =>
+        el('button', {
+          class: `mode-btn${state.mode === mode ? ' active' : ''}`,
+          onclick: () => {
+            if (state.mode === mode) return;
+            state.mode = mode;
+            sound.tap();
+            save();
+            showLevels();
+          },
+        },
+          el('span', { class: 'mode-title' }, label),
+          el('span', { class: 'mode-hint' }, hint),
+        );
+      return el('div', { class: 'mode-switch' },
+        option('choice', '🔘 Выбрать ответ', 'из четырёх вариантов'),
+        option('input', '⌨️ Вписать ответ', 'посчитай сам, без подсказок'),
+      );
+    }
+
     function showLevels() {
+      const best = records();
       root.replaceChildren(
         el('div', { class: 'level-select' },
           el('p', { class: 'game-intro' },
             `${api.profile.emoji} Машинист ${api.profile.name}, выбирай любую станцию! Реши ${QUESTIONS_PER_ROUND} примеров и собери звёзды.`),
+          modeSwitch(),
           el('div', { class: 'level-grid' },
             ...LEVELS.map((level) => {
-              const best = state.best[level.n];
+              const record = best[level.n];
               return el('button', { class: 'level-card', onclick: () => startRound(level) },
                 el('div', { class: 'level-icon' }, '🚉'),
                 el('div', { class: 'level-name' }, level.title),
                 el('div', { class: 'level-hint' }, level.hint),
                 el('div', { class: 'level-best' },
-                  best ? `${starRow(best.stars)} · ${best.correct}/${QUESTIONS_PER_ROUND}` : 'Не пройдена'),
+                  record ? `${starRow(record.stars)} · ${record.correct}/${QUESTIONS_PER_ROUND}` : 'Не пройдена'),
               );
             }),
           ),
@@ -179,20 +211,54 @@ export default {
         seen.add(question.text);
         index += 1;
 
-        const answers = el('div', { class: 'answer-grid' },
-          ...makeOptions(question.answer).map((option) =>
-            el('button', { class: 'answer-btn', onclick: (event) => onAnswer(event.currentTarget, option) }, option),
-          ),
-        );
+        const feedbackEl = el('p', { class: 'teaser-feedback' });
+        let answerArea;
+
+        if (state.mode === 'input') {
+          const input = el('input', {
+            class: 'teaser-input', type: 'number', inputmode: 'numeric', placeholder: 'Ответ',
+            onkeydown: (event) => { if (event.key === 'Enter' && input.value !== '') submit(input.value); },
+          });
+          answerArea = el('div', { class: 'teaser-answer-row' },
+            input,
+            el('button', {
+              class: 'btn btn-primary',
+              onclick: () => { if (input.value !== '') submit(input.value); },
+            }, 'Ответить'),
+          );
+          setTimeout(() => input.focus(), 50);
+        } else {
+          answerArea = el('div', { class: 'answer-grid' },
+            ...makeOptions(question.answer).map((option) =>
+              el('button', { class: 'answer-btn', onclick: (event) => onAnswer(event.currentTarget, option) }, option),
+            ),
+          );
+        }
+
+        let answered = false;
+
+        function submit(value) {
+          if (answered) return;
+          answered = true;
+          const isRight = Number(value) === question.answer;
+          if (isRight) correct += 1;
+          (isRight ? sound.right : sound.wrong)();
+          feedbackEl.textContent = isRight ? '✅ Верно!' : `❌ Правильный ответ: ${question.answer}`;
+          feedbackEl.className = `teaser-feedback ${isRight ? 'ok' : 'bad'}`;
+          answerArea.querySelectorAll('input, button').forEach((node) => { node.disabled = true; });
+          setTimeout(nextQuestion, isRight ? 900 : 2000);
+        }
 
         function onAnswer(button, option) {
-          answers.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+          if (answered) return;
+          answered = true;
+          answerArea.querySelectorAll('button').forEach((b) => { b.disabled = true; });
           const isRight = option === question.answer;
           if (isRight) correct += 1;
           (isRight ? sound.right : sound.wrong)();
           button.classList.add(isRight ? 'right' : 'wrong');
           if (!isRight) {
-            answers.querySelectorAll('button').forEach((b) => {
+            answerArea.querySelectorAll('button').forEach((b) => {
               if (Number(b.textContent) === question.answer) b.classList.add('right');
             });
           }
@@ -209,7 +275,8 @@ export default {
               el('div', { class: 'progress-fill', style: `width:${((index - 1) / QUESTIONS_PER_ROUND) * 100}%` }),
             ),
             el('div', { class: 'question' }, question.text),
-            answers,
+            answerArea,
+            feedbackEl,
             el('div', { class: 'game-toolbar' },
               el('button', { class: 'btn', onclick: () => { exited = true; showLevels(); } }, '🚪 К станциям'),
             ),
@@ -222,9 +289,10 @@ export default {
 
     function showResults(level, correct) {
       const stars = starsFor(correct);
-      const prev = state.best[level.n];
+      const best = records();
+      const prev = best[level.n];
       if (!prev || correct > prev.correct) {
-        state.best[level.n] = { correct, stars };
+        best[level.n] = { correct, stars };
       }
       save();
 
@@ -237,6 +305,8 @@ export default {
           starsEl(stars),
           el('h2', {}, correct >= GOOD_SCORE ? 'Отлично, машинист!' : 'Хорошая попытка!'),
           el('p', { class: 'results-score' }, `Правильных ответов: ${correct} из ${QUESTIONS_PER_ROUND}`),
+          el('p', { class: 'results-mode' },
+            state.mode === 'input' ? '⌨️ Режим: вписать ответ' : '🔘 Режим: выбрать из вариантов'),
           el('div', { class: 'results-actions' },
             el('button', { class: 'btn btn-primary', onclick: () => startRound(level) }, 'Ещё раз 🔁'),
             nextLevel

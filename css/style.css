@@ -360,6 +360,37 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
   margin-top: 14px;
 }
 
+/* Переключатель способа ответа */
+.mode-switch {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.mode-btn {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.mode-btn:hover { transform: translateY(-2px); }
+.mode-btn.active { border-color: var(--primary); background: var(--bg-accent); }
+
+.mode-title { font-weight: 800; font-size: 1rem; }
+.mode-hint { color: var(--ink-soft); font-size: 0.85rem; }
+
+.results-mode { color: var(--ink-soft); font-size: 0.9rem; margin: 0; }
+
 .level-card {
   border: none;
   background: var(--card);
