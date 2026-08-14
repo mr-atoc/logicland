@@ -689,6 +689,125 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
 
 .ws-help { text-align: center; color: var(--ink-soft); font-size: 0.9rem; }
 
+/* ---------- Кроссворд ---------- */
+.cw-wrap {
+  max-width: 560px;
+  margin: 0 auto;
+  animation: fade-up 0.3s ease both;
+}
+
+.cw-current-clue {
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  min-height: 2.6em;
+  display: flex;
+  align-items: center;
+}
+
+/* Большая сетка на узком экране прокручивается вбок,
+   чтобы клетки не становились меньше пальца */
+.cw-grid-scroll {
+  overflow-x: auto;
+  margin-bottom: 14px;
+}
+
+.cw-grid {
+  --cols: 9;
+  --cw-gap: 2px;
+  --cell: max(26px, calc((min(92vw, 520px) - var(--cw-gap) * (var(--cols) - 1)) / var(--cols)));
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  gap: var(--cw-gap);
+  width: max-content;
+  margin: 0 auto;
+}
+
+.cw-block { aspect-ratio: 1; }
+
+.cw-cell {
+  position: relative;
+  aspect-ratio: 1;
+  background: var(--card);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: background-color 0.15s ease;
+}
+
+.cw-input {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: inherit;
+  font-weight: 800;
+  /* не меньше 16px — иначе iOS зумит страницу при фокусе */
+  font-size: max(16px, calc(var(--cell) * 0.5));
+  color: var(--ink);
+  text-transform: uppercase;
+  caret-color: var(--primary);
+}
+
+.cw-input:focus { outline: none; }
+
+.cw-num {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  font-size: max(8px, calc(var(--cell) * 0.26));
+  line-height: 1.1;
+  font-weight: 700;
+  color: var(--ink-soft);
+  pointer-events: none;
+}
+
+.cw-cell.in-word { background: var(--bg-accent); }
+.cw-cell.active { box-shadow: inset 0 0 0 3px var(--primary); }
+.cw-cell.done { background: var(--right); }
+.cw-cell.done .cw-input { color: #fff; }
+.cw-cell.done .cw-num { color: rgba(255, 255, 255, 0.75); }
+.cw-cell.hinted .cw-input { color: var(--primary); }
+.cw-cell.bad { background: var(--conflict-bg); animation: shake 0.4s ease; }
+
+.cw-clues {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.cw-clue-col {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+}
+
+.cw-clue-col h3 { margin: 0 0 8px; font-size: 1rem; }
+
+.cw-clue {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.cw-clue:hover { background: var(--bg-accent); }
+.cw-clue.active { background: var(--bg-accent); box-shadow: inset 0 0 0 2px var(--primary); }
+.cw-clue.done { color: var(--ink-soft); text-decoration: line-through; }
+
 /* ---------- Плашка «вышла новая версия» ---------- */
 .update-banner {
   position: fixed;

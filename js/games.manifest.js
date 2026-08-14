@@ -35,6 +35,14 @@ export const games = [
     module: () => import('./games/word-search/game.js'),
   },
   {
+    id: 'crossword',
+    title: 'Кроссворд',
+    description: 'Настоящий кроссворд с вопросами: впиши слова по горизонтали и вертикали. Каждый раз новый!',
+    icon: '📗',
+    tags: ['слова', 'эрудиция'],
+    module: () => import('./games/crossword/game.js'),
+  },
+  {
     id: 'shape-matrix',
     title: 'Логические таблицы',
     description: 'В таблице спряталось правило — разгадай его и выбери, что должно быть в пустой клетке.',

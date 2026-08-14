@@ -2,7 +2,7 @@
 // дальше работает стратегия «кэш сразу, обновление в фоне» (stale-while-revalidate):
 // офлайн всё открывается из кэша, а при наличии сети кэш тихо обновляется.
 // ВАЖНО: при добавлении новой игры добавь её файлы в ASSETS.
-const CACHE = 'logoland-v17';
+const CACHE = 'logoland-v18';
 
 const ASSETS = [
   './',
@@ -29,6 +29,9 @@ const ASSETS = [
   'js/games/sudoku/generator.js',
   'js/games/word-search/game.js',
   'js/games/word-search/generator.js',
+  'js/games/crossword/game.js',
+  'js/games/crossword/generator.js',
+  'js/games/crossword/words.js',
   'js/games/shape-matrix/game.js',
   'js/games/shape-matrix/generator.js',
   'js/games/shape-matrix/shapes.js',
