@@ -647,6 +647,20 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
   gap: 3px;
   width: min(92vw, 520px);
   margin: 0 auto 4px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Буквы, по которым сейчас ведут пальцем */
+.ws-trace {
+  min-height: 1.6rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: 0.12em;
+  color: var(--primary);
+  margin-bottom: 6px;
 }
 
 .ws-cell {
