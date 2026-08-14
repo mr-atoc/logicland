@@ -3,27 +3,30 @@ import { shuffle, randInt, pick } from '../../core/dom.js';
 
 // Пирамида: rows массивов сверху вниз, вершина — один элемент.
 // Каждое число равно сумме двух чисел под ним.
-export function genPyramid(baseCount, maxBase, hideCount) {
-  for (let attempt = 0; attempt < 200; attempt++) {
-    const base = Array.from({ length: baseCount }, () => randInt(1, maxBase));
-    const rows = [base];
-    while (rows[0].length > 1) {
-      const prev = rows[0];
-      rows.unshift(prev.slice(1).map((v, i) => v + prev[i]));
-    }
-    const positions = [];
-    rows.forEach((row, r) => row.forEach((_, i) => positions.push(`${r},${i}`)));
-    const hidden = new Set(shuffle(positions).slice(0, hideCount));
-    if (isSolvable(rows, hidden)) return { rows, hidden };
-  }
-  // безопасный вариант: прячем только вершину
+// minHideRow — с какого ряда сверху разрешено прятать числа: у высоких башен
+// верхние числа большие, поэтому пропуски держим в нижних рядах, где счёт проще.
+export function genPyramid(baseCount, maxBase, hideCount, minHideRow = 0) {
   const base = Array.from({ length: baseCount }, () => randInt(1, maxBase));
   const rows = [base];
   while (rows[0].length > 1) {
     const prev = rows[0];
     rows.unshift(prev.slice(1).map((v, i) => v + prev[i]));
   }
-  return { rows, hidden: new Set(['0,0']) };
+
+  const candidates = [];
+  rows.forEach((row, r) => {
+    if (r < minHideRow) return;
+    row.forEach((_, i) => candidates.push(`${r},${i}`));
+  });
+
+  // Прячем числа по одному, откатывая те, из-за которых башня перестаёт решаться.
+  const hidden = new Set();
+  for (const key of shuffle(candidates)) {
+    if (hidden.size >= hideCount) break;
+    hidden.add(key);
+    if (!isSolvable(rows, hidden)) hidden.delete(key);
+  }
+  return { rows, hidden };
 }
 
 // Пирамида решается, если каждую скрытую клетку можно вывести:

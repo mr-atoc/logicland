@@ -990,28 +990,35 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
 
 /* ---------- Пирамиды и весы ---------- */
 .pyramid {
+  /* --cols (число клеток в основании) выставляет игра: чем шире башня,
+     тем мельче клетки, чтобы любая высота помещалась на экране */
+  --cols: 4;
+  --pyr-gap: clamp(3px, 1vw, 6px);
+  --cell: clamp(26px, calc((min(92vw, 520px) - 24px - var(--pyr-gap) * (var(--cols) - 1)) / var(--cols)), 68px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  align-items: safe center;
+  gap: var(--pyr-gap);
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 22px 12px;
   margin-bottom: 14px;
+  overflow-x: auto;
 }
 
-.pyramid-row { display: flex; gap: 6px; }
+.pyramid-row { display: flex; gap: var(--pyr-gap); }
 
 .pyramid-cell {
-  width: clamp(54px, 14vw, 68px);
-  height: 48px;
+  width: var(--cell);
+  height: min(48px, calc(var(--cell) * 0.86));
   display: grid;
   place-items: center;
   border: 2px solid var(--line);
   border-radius: 10px;
   background: var(--bg);
-  font-size: 1.15rem;
+  font-size: min(1.15rem, calc(var(--cell) * 0.34));
   font-weight: 800;
   font-family: inherit;
   color: var(--ink);
