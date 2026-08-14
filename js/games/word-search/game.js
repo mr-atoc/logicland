@@ -171,6 +171,28 @@ export default {
         return [r, c];
       }
 
+      // Быстрый штрих (особенно пером) перепрыгивает через клетки — проходим
+      // пропущенные по прямой, чтобы цепочка не рвалась.
+      function moveTo(r, c) {
+        const last = path[path.length - 1];
+        if (!last) return;
+        if (last[0] !== r && last[1] !== c) {
+          extendTo(r, c);
+          return;
+        }
+        const dr = Math.sign(r - last[0]);
+        const dc = Math.sign(c - last[1]);
+        let [cr, cc] = last;
+        while (cr !== r || cc !== c) {
+          cr += dr;
+          cc += dc;
+          const before = path[path.length - 1];
+          extendTo(cr, cc);
+          const after = path[path.length - 1];
+          if (!after || (after[0] === before?.[0] && after[1] === before?.[1])) break;
+        }
+      }
+
       gridEl.addEventListener('pointerdown', (event) => {
         const cell = cellFromEvent(event);
         if (!cell) return;
@@ -195,12 +217,17 @@ export default {
 
       gridEl.addEventListener('pointermove', (event) => {
         if (!dragging) return;
-        const cell = cellFromEvent(event);
-        if (!cell) return;
-        const last = path[path.length - 1];
-        if (last && last[0] === cell[0] && last[1] === cell[1]) return;
-        dragMoved = true;
-        extendTo(cell[0], cell[1]);
+        // getCoalescedEvents отдаёт все точки штриха между кадрами —
+        // перо на iPad рисует гораздо чаще, чем приходят обычные события
+        const points = event.getCoalescedEvents?.() ?? [];
+        for (const point of (points.length ? points : [event])) {
+          const cell = cellFromEvent(point);
+          if (!cell) continue;
+          const last = path[path.length - 1];
+          if (last && last[0] === cell[0] && last[1] === cell[1]) continue;
+          dragMoved = true;
+          moveTo(cell[0], cell[1]);
+        }
       });
 
       const endDrag = () => {
@@ -254,8 +281,8 @@ export default {
           ),
           el('p', { class: 'ws-help' },
             level.snake
-              ? 'Веди пальцем по буквам — слово может поворачивать в любую сторону.'
-              : 'Веди пальцем по буквам слова или нажимай их по очереди.'),
+              ? 'Обведи слово пальцем или пером — оно может поворачивать в любую сторону.'
+              : 'Обведи слово пальцем или пером, можно и нажимать буквы по очереди.'),
         ),
       );
       renderChips();

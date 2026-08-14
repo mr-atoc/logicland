@@ -680,7 +680,12 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
   transition: background-color 0.15s ease, transform 0.12s ease;
 }
 
-.ws-cell:hover { transform: scale(1.08); }
+/* только там, где курсор настоящий: перо на iPad тоже умеет наводиться,
+   и клетки бы дёргались под ним при рисовании */
+@media (hover: hover) and (pointer: fine) {
+  .ws-cell:hover { transform: scale(1.08); }
+}
+
 .ws-cell.sel { background: var(--primary); color: #fff; transform: scale(1.08); }
 .ws-cell.found { background: var(--right); color: #fff; }
 .ws-cell.just-found { background: var(--right); color: #fff; animation: pop 0.45s ease; }

@@ -165,18 +165,42 @@ export default {
       };
       window.addEventListener('keydown', keyHandler);
 
+      // Быстрый штрих перепрыгивает клетки — проходим пропущенные по прямой,
+      // каждый шаг всё равно проверяется на стену.
+      function stepTowards(r, c) {
+        const [er, ec] = endCell();
+        if (er !== r && ec !== c) {
+          tryCell(r, c);
+          return;
+        }
+        const dr = Math.sign(r - er);
+        const dc = Math.sign(c - ec);
+        let cr = er;
+        let cc = ec;
+        while (cr !== r || cc !== c) {
+          cr += dr;
+          cc += dc;
+          const before = endCell();
+          tryCell(cr, cc);
+          const after = endCell();
+          if (after[0] === before[0] && after[1] === before[1]) break;
+        }
+      }
+
       function onPoint(event) {
         const rect = gridEl.getBoundingClientRect();
         const c = Math.floor(((event.clientX - rect.left) / rect.width) * n);
         const r = Math.floor(((event.clientY - rect.top) / rect.height) * n);
-        if (r >= 0 && r < n && c >= 0 && c < n) tryCell(r, c);
+        if (r >= 0 && r < n && c >= 0 && c < n) stepTowards(r, c);
       }
       gridEl.addEventListener('pointerdown', (event) => {
         try { gridEl.setPointerCapture(event.pointerId); } catch { /* не критично */ }
         onPoint(event);
       });
       gridEl.addEventListener('pointermove', (event) => {
-        if (event.buttons) onPoint(event);
+        if (!event.buttons) return;
+        const points = event.getCoalescedEvents?.() ?? [];
+        for (const point of (points.length ? points : [event])) onPoint(point);
       });
 
       const padBtn = (label, dr, dc) =>
@@ -312,6 +336,38 @@ export default {
         }
       }
 
+      // Как и в квадратном лабиринте: добираем клетки, пропущенные быстрым штрихом
+      function stepTowards(target) {
+        const end = endCell();
+        if (end.r === target.r) {
+          // по кольцу — идём в ближайшую сторону
+          let diff = ((target.s - end.s + sectors) % sectors);
+          const dir = diff <= sectors / 2 ? 1 : -1;
+          if (dir === -1) diff = sectors - diff;
+          let s = end.s;
+          for (let i = 0; i < diff; i++) {
+            s = (s + dir + sectors) % sectors;
+            const before = endCell();
+            tryCell({ r: end.r, s });
+            const after = endCell();
+            if (after.r === before.r && after.s === before.s) break;
+          }
+          return;
+        }
+        if (end.s === target.s) {
+          const dir = Math.sign(target.r - end.r);
+          for (let r = end.r + dir; ; r += dir) {
+            const before = endCell();
+            tryCell({ r, s: target.s });
+            const after = endCell();
+            if (after.r === before.r && after.s === before.s) break;
+            if (r === target.r) break;
+          }
+          return;
+        }
+        tryCell(target);
+      }
+
       function onPoint(event) {
         const rect = svg.getBoundingClientRect();
         const scale = SZ / rect.width;
@@ -321,14 +377,16 @@ export default {
         const angle = (Math.atan2(y, x) + Math.PI * 2) % (Math.PI * 2);
         const r = Math.floor((radius - R0) / t);
         const s = Math.floor(angle / astep);
-        if (r >= 0 && r < rings && s >= 0 && s < sectors) tryCell({ r, s });
+        if (r >= 0 && r < rings && s >= 0 && s < sectors) stepTowards({ r, s });
       }
       svg.addEventListener('pointerdown', (event) => {
         try { svg.setPointerCapture(event.pointerId); } catch { /* не критично */ }
         onPoint(event);
       });
       svg.addEventListener('pointermove', (event) => {
-        if (event.buttons) onPoint(event);
+        if (!event.buttons) return;
+        const points = event.getCoalescedEvents?.() ?? [];
+        for (const point of (points.length ? points : [event])) onPoint(point);
       });
 
       root.replaceChildren(
