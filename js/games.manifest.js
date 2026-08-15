@@ -35,6 +35,14 @@ export const games = [
     module: () => import('./games/word-search/game.js'),
   },
   {
+    id: 'nonogram',
+    title: 'Японский кроссворд',
+    description: 'Числа подсказывают, сколько клеток закрашено подряд. Разгадай — и проявится картинка!',
+    icon: '🖼️',
+    tags: ['логика'],
+    module: () => import('./games/nonogram/game.js'),
+  },
+  {
     id: 'crossword',
     title: 'Кроссворд',
     description: 'Настоящий кроссворд с вопросами: впиши слова по горизонтали и вертикали. Каждый раз новый!',

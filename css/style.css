@@ -694,6 +694,109 @@ body::after { background: var(--blob-2); bottom: -150px; right: -130px; }
 
 .ws-help { text-align: center; color: var(--ink-soft); font-size: 0.9rem; }
 
+/* ---------- Нонограммы ---------- */
+.ng-wrap {
+  max-width: 560px;
+  margin: 0 auto;
+  animation: fade-up 0.3s ease both;
+}
+
+.ng-board {
+  --cols: 10;
+  --clue-cols: 3;
+  --clue-rows: 3;
+  /* --cell выставляет игра: считает в пикселях, чтобы поле вместе
+     с подсказками наверняка влезло в экран любой ширины */
+  --cell: 30px;
+  --clue-size: calc(var(--cell) * 0.62);
+  display: grid;
+  grid-template-columns: calc(var(--clue-size) * var(--clue-cols)) auto;
+  justify-content: center;
+  margin: 8px 0 14px;
+}
+
+.ng-col-clues {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+}
+
+.ng-col-clues .ng-clue-line {
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: calc(var(--clue-size) * var(--clue-rows));
+}
+
+.ng-row-clues {
+  display: grid;
+  grid-template-rows: repeat(var(--cols), var(--cell));
+}
+
+.ng-clue-line {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: calc(var(--cell) * 0.12);
+  padding: 0 2px;
+  font-size: max(9px, calc(var(--cell) * 0.46));
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.05;
+}
+
+.ng-clue-line.done { color: var(--ink-soft); opacity: 0.45; }
+
+.ng-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  background: var(--card);
+  box-shadow: 0 0 0 2px var(--ink);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ng-cell {
+  width: var(--cell);
+  height: var(--cell);
+  box-shadow: inset 0 0 0 1px var(--line);
+  position: relative;
+  transition: background-color 0.1s ease;
+}
+
+.ng-cell.edge-right { box-shadow: inset 0 0 0 1px var(--line), inset -2px 0 0 -1px var(--ink); }
+.ng-cell.edge-bottom { box-shadow: inset 0 0 0 1px var(--line), inset 0 -2px 0 -1px var(--ink); }
+.ng-cell.edge-right.edge-bottom {
+  box-shadow: inset 0 0 0 1px var(--line), inset -2px 0 0 -1px var(--ink), inset 0 -2px 0 -1px var(--ink);
+}
+
+.ng-cell.filled { background: var(--primary); }
+.ng-cell.hinted.filled { background: var(--logo-2); }
+
+.ng-cell.crossed::after {
+  content: '×';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--cell) * 0.6);
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.btn.mode-cross { background: var(--bg-accent); box-shadow: inset 0 0 0 2px var(--primary); }
+
+.ng-preview {
+  --cols: 10;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  width: min(60vw, 200px);
+  margin: 12px auto;
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+.ng-preview-cell { aspect-ratio: 1; }
+.ng-preview-cell.filled { background: var(--primary); }
+
 /* ---------- Кроссворд ---------- */
 .cw-wrap {
   max-width: 560px;
