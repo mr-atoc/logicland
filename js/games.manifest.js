@@ -35,6 +35,14 @@ export const games = [
     module: () => import('./games/word-search/game.js'),
   },
   {
+    id: 'bridges',
+    title: 'Мосты',
+    description: 'Соедини острова мостами: число на острове — сколько мостов к нему подходит. Добраться нужно от любого острова до любого.',
+    icon: '🏝️',
+    tags: ['логика'],
+    module: () => import('./games/bridges/game.js'),
+  },
+  {
     id: 'nonogram',
     title: 'Японский кроссворд',
     description: 'Числа подсказывают, сколько клеток закрашено подряд. Разгадай — и проявится картинка!',
